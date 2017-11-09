@@ -1,94 +1,74 @@
+// Coding Rainbow
+// Daniel Shiffman
+// http://patreon.com/codingtrain
+// Code for: https://youtu.be/E1B4UoSQMFw
 
-function setup(){
-  createCanvas(800, 400); 
-  r = 40;
-  ballpos = 240;
-  score = 0;
+// variables: A B
+// axiom: A
+// rules: (A → AB), (B → A)
+var angle;
+var axiom = "F";
+var sentence = axiom;
+var len = 100;
+
+var rules = [];
+rules[0] = {
+  a: "F",
+  b: "FF+[+F-F-F]-[-F+F+F]"
 }
 
-function draw(){
-	background(0,153,0);
-	textAlign(CENTER);
-	text("Current break = " + score, width/2, 300);
-	RedBall();
-	YellowBall();
-	GreenBall();
-	BrownBall();
-	BlueBall();
-	PinkBall();
-	BlackBall();
+function generate() {
+  len *= 0.5;
+  var nextSentence = "";
+  for (var i = 0; i < sentence.length; i++) {
+    var current = sentence.charAt(i);
+    var found = false;
+    for (var j = 0; j < rules.length; j++) {
+      if (current == rules[j].a) {
+        found = true;
+        nextSentence += rules[j].b;
+        break;
+      }
+    }
+    if (!found) {
+      nextSentence += current;
+    }
+  }
+  sentence = nextSentence;
+  createP(sentence);
+  turtle();
+
 }
 
-function RedBall(){
-  	fill(200,0,0);
-  	stroke(200, 0, 0);  
-  	ellipse(width/8*1, ballpos, r);
-	}
+function turtle() {
+  background(51);
+  resetMatrix();
+  translate(width / 2, height);
+  stroke(255, 100);
+  for (var i = 0; i < sentence.length; i++) {
+    var current = sentence.charAt(i);
 
-function YellowBall(){
-  	fill(200,200,0);  
-  	stroke(200,200,0);
-  	ellipse(width/8*2, ballpos, r);
-	}
-
-function GreenBall(){
-  	fill(0,100,0);  
-  	stroke(0,100,0);
-  	ellipse(width/8*3, ballpos, r);
-	}
-
-function BrownBall(){
-  	fill(100,50,0);  
-  	stroke(100,50,0);
-  	ellipse(width/8*4, ballpos, r);
-	}
-
-function BlueBall(){
-  	fill(0,0,150);
-  	stroke(0,0,150);  
-  	ellipse(width/8*5, ballpos, r);
-	}
-
-function PinkBall(){
-  	fill(255,100,178);  
-  	stroke(255,100,178);
-  	ellipse(width/8*6, ballpos, r);
-	}
-
-function BlackBall(){
-  	fill(0,0,0);  
-  	stroke(0,0,0);
-  	ellipse(width/8*7, ballpos, r);
-	}
-
-function mousePressed(){
-	let red = dist(mouseX, mouseY, width/8, ballpos);
-	if(red<r){
-		score += 1;
-	}
-	let yellow = dist(mouseX, mouseY, width/8*2, ballpos);
-	if(yellow<r){
-		score += 2;
-	}
-	let green = dist(mouseX, mouseY, width/8*3, ballpos);
-	if(green<r){
-		score += 3;
-	}
-	let brown = dist(mouseX, mouseY, width/8*4, ballpos);
-	if(brown<r){
-		score += 4;
-	}
-	let blue = dist(mouseX, mouseY, width/8*5, ballpos);
-	if(blue<r){
-		score += 5;
-	}
-	let pink = dist(mouseX, mouseY, width/8*6, ballpos);
-	if(pink<r){
-		score += 6;
-	}
-	let black = dist(mouseX, mouseY, width/8*7, ballpos);
-	if(black<r){
-		score += 7;
-	}
+    if (current == "F") {
+      line(0, 0, 0, -len);
+      translate(0, -len);
+    } else if (current == "+") {
+      rotate(angle);
+    } else if (current == "-") {
+      rotate(-angle)
+    } else if (current == "[") {
+      push();
+    } else if (current == "]") {
+      pop();
+    }
+  }
 }
-	
+
+function setup() {
+  createCanvas(400, 400);
+  angle = radians(25);
+  background(51);
+  createP(axiom);
+  turtle();
+  var button = createButton("generate");
+  button.mousePressed(generate);
+}
